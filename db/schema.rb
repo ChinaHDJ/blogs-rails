@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(version: 2018_12_20_133423) do
   create_table "sessions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.string "access_token"
+    t.datetime "expire_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

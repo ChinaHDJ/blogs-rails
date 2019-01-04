@@ -1,12 +1,12 @@
-class Api::V1::Application < ActionController::API
-  before_action :authenticate!
+class Api::V1::ApplicationController < ActionController::API
+  #before_action :authenticate!
 
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   private
 
   def authenticate!
-    josn = App.Token.decode(params[:access_token])
+    josn = App::UserToken.decode(params[:access_token])
 
     session = Session.find(json['session_id'])
 
@@ -15,7 +15,7 @@ class Api::V1::Application < ActionController::API
   end
 
   def record_not_found
-    render404('record_not_found', '请求资源不存在')
+    render404('record_not_found', '404')
   end
 
   def render404(type, message)
