@@ -33,6 +33,7 @@ module JsonWebToken
       def create(hash)
         email = hash[:email]
         password = hash[:password]
+        puts email,password
         user = User.find_by(email: email)
 
         if !user.nil? &&  user.authenticate(password)
@@ -47,7 +48,7 @@ module JsonWebToken
               nbf: Time.now
           }
 
-          TokenStruct.new(true, nil, JWT.encode(payload, SECRET_KEY, 'HS256'))
+          TokenStruct.new(true, '登入成功', JWT.encode(payload, SECRET_KEY, 'HS256'))
         end
       end
 
