@@ -21,13 +21,19 @@ module JsonWebToken
       end
 
       def decode(token)
-        JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')
+        @decode ||= JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')
       rescue JWT::DecodeError
         TokenStruct.new(false, '这是一个无效的token', nil)
       rescue JWT::ExpiredSignature
         TokenStruct.new(false, 'token已过期', nil)
       rescue JWT::ImmatureSignature
         TokenStruct.new(false, 'token数据异常', nil)
+      end
+
+      def auth_user(token)
+        result = decode(token)
+
+        User.find(result[0]['user_id'])
       end
 
       def create(hash)
@@ -49,6 +55,8 @@ module JsonWebToken
           }
 
           TokenStruct.new(true, '登入成功', JWT.encode(payload, SECRET_KEY, 'HS256'))
+        else
+          TokenStruct.new(false, '邮箱或密码错误', nil)
         end
       end
 
