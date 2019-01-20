@@ -11,4 +11,11 @@ class ApplicationController < ActionController::API
     params[:token]
   end
 
+  def render_success(message, attributes = {})
+    render json: { success: true, message: message }.merge(attributes: attributes)
+  end
+
+  def render_error(message, attributes = {})
+    render json: { success: false, message: message }.merge(attributes: attributes)
+  end
 end

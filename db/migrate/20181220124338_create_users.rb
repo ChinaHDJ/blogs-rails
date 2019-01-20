@@ -5,9 +5,10 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string :username
       t.string :email
       t.string :password_digest
+      t.integer :permission
+      t.string :desc
       t.boolean :is_deleted
       t.datetime :deleted_at
-      t.integer :permission
       t.timestamps
     end
   end

@@ -1,4 +1,4 @@
 class ErrorSerializer
   include FastJsonapi::ObjectSerializer
-  attributes 
+  attributes :success, :message
 end

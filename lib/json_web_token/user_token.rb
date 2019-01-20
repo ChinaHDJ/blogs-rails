@@ -4,30 +4,8 @@ module JsonWebToken
     TokenStruct = Struct.new(:success, :message, :token)
 
     class << self
-      def auth(token)
-        result = decode(token)
-
-        return result if result.is_a?(TokenStruct)
-
-        payload = result[0]
-        user_id = payload['user_id']
-        access_token = payload['access_token']
-
-        session = Session.find_by(user_id: user_id)
-
-        raise ActiveRecord::RecordNotFound if session.nil?
-
-        session.access_token === access_token
-      end
-
       def decode(token)
-        @decode ||= JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')
-      rescue JWT::DecodeError
-        TokenStruct.new(false, '这是一个无效的token', nil)
-      rescue JWT::ExpiredSignature
-        TokenStruct.new(false, 'token已过期', nil)
-      rescue JWT::ImmatureSignature
-        TokenStruct.new(false, 'token数据异常', nil)
+        @decode ||= JWT.decode(token, SECRET_KEY, true, algorithm: 'HS256')[0]
       end
 
       def auth_user(token)
@@ -53,7 +31,6 @@ module JsonWebToken
               exp: (Time.new + 30.day).to_i,
               nbf: Time.now
           }
-
           TokenStruct.new(true, '登入成功', JWT.encode(payload, SECRET_KEY, 'HS256'))
         else
           TokenStruct.new(false, '邮箱或密码错误', nil)

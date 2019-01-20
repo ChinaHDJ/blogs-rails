@@ -1,21 +1,15 @@
 class Api::V1::ApplicationController < ActionController::API
-  before_action :authenticate
+  include SetCurrentConcern
+  include AuthTokenConcern
+
+  before_action :authenticate!
 
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
   private
 
-  def authenticate
-    @token = params.dig(:session, :token)
-
-    return render_error_message('token值不能为空') if token.blank?
-    result = JsonWebToken::UserToken.auth(token)
-    return render json: result if result.is_a?(Struct)
-    render_error_message('token有误。可能已经过期了') unless result
-  end
-
   def curr_user
-    @curr_user ||= JsonWebToken::UserToken.auth_user(@token)
+    Current.user
   end
 
   def record_not_found
@@ -27,14 +21,14 @@ class Api::V1::ApplicationController < ActionController::API
         type: type,
         success: false,
         message: message
-    }
+    }, status: 404
   end
 
-  def render_error_message(message)
+  def render_error_message(message, status)
     render json: {
         success: false,
         message: message
-    }
+    }, status: status
   end
 
   def render_success_message(message)
@@ -44,11 +38,15 @@ class Api::V1::ApplicationController < ActionController::API
     }
   end
 
+  def render_serializers(serializers, status = 200)
+    render json: serializers, status: status
+  end
+
   def handle_params
     begin
       send("param_record_#{params[:action]}")
     rescue
-      render_error_message('参数有误')
+      render_error_message('参数有误', 403)
     end
   end
 

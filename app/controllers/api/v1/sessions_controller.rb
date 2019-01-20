@@ -1,17 +1,17 @@
 class Api::V1::SessionsController < Api::V1::ApplicationController
-  skip_before_action :authenticate, only: :create
+  skip_before_action :authenticate!, only: :create
 
   before_action :handle_params
 
   def create
-    render json: JsonWebToken::UserToken.create(@param_session)
+    render json: JsonWebToken::UserToken.create(@param_session).to_h
   end
 
   def destroy
     if JsonWebToken::UserToken.destroy(@param_session[:token])
       render_success_message('用户注销成功')
     else
-      render_error_message('用户注销失败')
+      render_error_message('用户注销失败', 401)
     end
   end
 
