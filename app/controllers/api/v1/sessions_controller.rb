@@ -4,7 +4,7 @@ class Api::V1::SessionsController < Api::V1::ApplicationController
   before_action :handle_params
 
   def create
-    render json: JsonWebToken::UserToken.create(@param_session).to_h
+    render json: SessionModule::UserTokenCreateService.execute(user: nil, params: @param_session)
   end
 
   def destroy
